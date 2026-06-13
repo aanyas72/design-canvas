@@ -66,11 +66,11 @@ export default function CanvasPage() {
     (instanceId: string, updates: Partial<CanvasItem>) => {
       setItems((prev) =>
         prev.map((item) =>
-          item.instanceId === instanceId ? { ...item, ...updates } : item
-        )
+          item.instanceId === instanceId ? { ...item, ...updates } : item,
+        ),
       );
     },
-    []
+    [],
   );
 
   const handleDelete = () => {
@@ -84,7 +84,15 @@ export default function CanvasPage() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-neutral-950 text-neutral-100 overflow-hidden">
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        backgroundColor: "#030712",
+        color: "#f5f5f5",
+        overflow: "hidden",
+      }}
+    >
       <Sidebar
         palette={palette}
         submittedPrompt={submittedPrompt}
@@ -92,13 +100,25 @@ export default function CanvasPage() {
         onGenerate={handleGenerate}
         onAddAsset={handleAddAsset}
       />
-      <main className="flex-1 flex flex-col min-w-0">
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+        }}
+      >
         <Topbar
-          sessionName={submittedPrompt ? `"${submittedPrompt}"` : "Untitled session"}
+          sessionName={
+            submittedPrompt ? `"${submittedPrompt}"` : "Untitled session"
+          }
           itemCount={items.length}
           hasSelection={!!selectedId}
           onDelete={handleDelete}
-          onClear={() => { setItems([]); setSelectedId(null); }}
+          onClear={() => {
+            setItems([]);
+            setSelectedId(null);
+          }}
         />
         <CanvasStage
           items={items}

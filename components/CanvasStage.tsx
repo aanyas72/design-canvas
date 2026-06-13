@@ -39,11 +39,39 @@ export default function CanvasStage({
   })();
 
   return (
-    <div ref={containerRef} className="flex-1 relative overflow-hidden bg-neutral-950">
+    <div
+      ref={containerRef}
+      style={{
+        flex: 1,
+        position: "relative",
+        overflow: "hidden",
+        backgroundColor: "#030712",
+      }}
+    >
       {items.length === 0 && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none gap-3">
-          <div className="w-px h-16 bg-gradient-to-b from-transparent to-neutral-800" />
-          <p className="text-neutral-700 text-sm">Click an asset to place it</p>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            pointerEvents: "none",
+            userSelect: "none",
+            gap: "12px",
+          }}
+        >
+          <div
+            style={{
+              width: 1,
+              height: 64,
+              background: "linear-gradient(to bottom, transparent, #404040)",
+            }}
+          />
+          <p style={{ color: "#525252", fontSize: "14px" }}>
+            Click an asset to place it
+          </p>
         </div>
       )}
       <Stage

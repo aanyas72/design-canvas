@@ -4,13 +4,14 @@ export default function AssetThumb({ asset }: { asset: Asset }) {
   const r = asset.render;
   const vw = (r.width || 80) + 10;
   const vh = (r.height || 80) + 10;
-  const ox = 5, oy = 5;
+  const ox = 5,
+    oy = 5;
 
   return (
     <svg
       viewBox={`0 0 ${vw} ${vh}`}
       xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
+      style={{ width: "100%", height: "100%" }}
     >
       {r.type === "path" && (
         <path
@@ -61,14 +62,22 @@ export default function AssetThumb({ asset }: { asset: Asset }) {
       {r.type === "cross" && (
         <>
           <line
-            x1={ox + 10} y1={oy + 10}
-            x2={ox + r.width - 10} y2={oy + r.height - 10}
-            stroke={r.stroke} strokeWidth={r.strokeWidth} strokeLinecap="round"
+            x1={ox + 10}
+            y1={oy + 10}
+            x2={ox + r.width - 10}
+            y2={oy + r.height - 10}
+            stroke={r.stroke}
+            strokeWidth={r.strokeWidth}
+            strokeLinecap="round"
           />
           <line
-            x1={ox + r.width - 10} y1={oy + 10}
-            x2={ox + 10} y2={oy + r.height - 10}
-            stroke={r.stroke} strokeWidth={r.strokeWidth} strokeLinecap="round"
+            x1={ox + r.width - 10}
+            y1={oy + 10}
+            x2={ox + 10}
+            y2={oy + r.height - 10}
+            stroke={r.stroke}
+            strokeWidth={r.strokeWidth}
+            strokeLinecap="round"
           />
         </>
       )}

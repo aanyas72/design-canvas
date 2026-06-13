@@ -16,20 +16,74 @@ export default function Topbar({
   onClear,
 }: Props) {
   return (
-    <div className="h-11 border-b border-neutral-800 flex items-center justify-between px-5 flex-shrink-0 bg-neutral-950">
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-neutral-200">{sessionName}</span>
+    <div
+      style={{
+        height: 44,
+        borderBottom: "1px solid #404040",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingLeft: 32,
+        paddingRight: 32,
+        flexShrink: 0,
+        backgroundColor: "#030712",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <span style={{ fontSize: "14px", fontWeight: 500, color: "#e5e5e5" }}>
+          {sessionName}
+        </span>
         {itemCount > 0 && (
-          <span className="text-[10px] text-neutral-600">
+          <span style={{ fontSize: "10px", color: "#595959" }}>
             {itemCount} element{itemCount !== 1 ? "s" : ""}
           </span>
         )}
       </div>
-      <div className="flex items-center gap-1">
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <button
+          style={{
+            fontSize: "11px",
+            color: "#d4d4d4",
+            padding: "6px 12px",
+            borderRadius: "4px",
+            border: "none",
+            backgroundColor: "transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            cursor: "pointer",
+            marginRight: "8px",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "white";
+            e.currentTarget.style.backgroundColor = "#262626";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#d4d4d4";
+            e.currentTarget.style.backgroundColor = "transparent";
+          }}
+        >
+          <span>+</span>
+          <span>Invite</span>
+        </button>
         {hasSelection && (
           <button
             onClick={onDelete}
-            className="text-[11px] text-neutral-500 hover:text-red-400 transition-colors px-2 py-1 rounded"
+            style={{
+              fontSize: "11px",
+              color: "#808080",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              border: "none",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#f87171";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#808080";
+            }}
           >
             Delete
           </button>
@@ -37,7 +91,21 @@ export default function Topbar({
         {itemCount > 0 && (
           <button
             onClick={onClear}
-            className="text-[11px] text-neutral-600 hover:text-neutral-400 transition-colors px-2 py-1 rounded"
+            style={{
+              fontSize: "11px",
+              color: "#737373",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              border: "none",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#a3a3a3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#737373";
+            }}
           >
             Clear all
           </button>

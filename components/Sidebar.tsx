@@ -28,14 +28,40 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-60 flex-shrink-0 border-r border-neutral-800 flex flex-col bg-neutral-950">
+    <aside
+      style={{
+        width: 280,
+        flexShrink: 0,
+        borderRight: "1px solid #404040",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#030712",
+      }}
+    >
       {/* Prompt input */}
-      <div className="p-4 border-b border-neutral-800">
-        <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">
+      <div style={{ padding: "16px", borderBottom: "1px solid #404040" }}>
+        <p
+          style={{
+            fontSize: "10px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            color: "#737373",
+            marginBottom: "8px",
+          }}
+        >
           Prompt
         </p>
         <textarea
-          className="w-full bg-neutral-900 border border-neutral-800 hover:border-neutral-700 focus:border-neutral-600 rounded-lg text-sm text-neutral-100 placeholder-neutral-600 p-2.5 resize-none focus:outline-none transition-colors"
+          style={{
+            width: "100%",
+            backgroundColor: "#1a1a1a",
+            border: "1px solid #404040",
+            borderRadius: "6px",
+            fontSize: "14px",
+            color: "#f5f5f5",
+            padding: "10px",
+            resize: "none",
+          }}
           rows={3}
           placeholder="morning fog, tension…"
           value={prompt}
@@ -46,41 +72,118 @@ export default function Sidebar({
               handleSubmit();
             }
           }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "#505050";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "#404040";
+          }}
         />
         <button
           onClick={handleSubmit}
           disabled={isLoading || !prompt.trim()}
-          className="mt-2 w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-medium py-2 rounded-lg transition-colors"
+          style={{
+            marginTop: "8px",
+            width: "100%",
+            backgroundColor:
+              isLoading || !prompt.trim() ? "#4338ca99" : "#4338ca",
+            color: "white",
+            fontSize: "12px",
+            fontWeight: 500,
+            padding: "8px 0",
+            borderRadius: "6px",
+            border: "none",
+            cursor: isLoading || !prompt.trim() ? "not-allowed" : "pointer",
+            opacity: isLoading || !prompt.trim() ? 0.4 : 1,
+            transition: "background-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (!isLoading && prompt.trim())
+              e.currentTarget.style.backgroundColor = "#3730a3";
+          }}
+          onMouseLeave={(e) => {
+            if (!isLoading && prompt.trim())
+              e.currentTarget.style.backgroundColor = "#4338ca";
+          }}
         >
           {isLoading ? "Pulling assets…" : "Generate palette"}
         </button>
       </div>
 
       {/* Asset palette */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
         {submittedPrompt && (
-          <p className="text-[10px] text-neutral-500 mb-3 leading-relaxed">
-            <span className="text-neutral-400">{palette.length} assets</span>{" "}
+          <p
+            style={{
+              fontSize: "10px",
+              color: "#737373",
+              marginBottom: "12px",
+              lineHeight: 1.5,
+            }}
+          >
+            <span style={{ color: "#a3a3a3" }}>{palette.length} assets</span>{" "}
             for &ldquo;{submittedPrompt}&rdquo;
           </p>
         )}
         {!submittedPrompt && (
-          <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-3">
+          <p
+            style={{
+              fontSize: "10px",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: "#737373",
+              marginBottom: "12px",
+            }}
+          >
             Default palette
           </p>
         )}
-        <div className="grid grid-cols-3 gap-2">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "8px",
+          }}
+        >
           {palette.map((asset) => (
             <button
               key={asset.id}
               onClick={() => onAddAsset(asset)}
               title={`Add ${asset.label}`}
-              className="aspect-square bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-600 rounded-lg p-2 flex flex-col items-center justify-center gap-1 transition-all group cursor-pointer"
+              style={{
+                aspectRatio: "1",
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #404040",
+                borderRadius: "6px",
+                padding: "8px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "4px",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#262626";
+                e.currentTarget.style.borderColor = "#505050";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#1a1a1a";
+                e.currentTarget.style.borderColor = "#404040";
+              }}
             >
-              <div className="w-8 h-8">
+              <div style={{ width: 32, height: 32 }}>
                 <AssetThumb asset={asset} />
               </div>
-              <span className="text-[9px] text-neutral-600 group-hover:text-neutral-400 transition-colors leading-tight text-center">
+              <span
+                style={{
+                  fontSize: "9px",
+                  color: "#737373",
+                  transition: "color 0.2s",
+                  lineHeight: 1.2,
+                  textAlign: "center",
+                }}
+              >
                 {asset.label}
               </span>
             </button>
@@ -89,8 +192,8 @@ export default function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-neutral-800">
-        <p className="text-[10px] text-neutral-700 leading-relaxed">
+      <div style={{ padding: "12px 16px", borderTop: "1px solid #404040" }}>
+        <p style={{ fontSize: "10px", color: "#585858", lineHeight: 1.5 }}>
           Click to place · drag · resize · rotate · delete to remove
         </p>
       </div>
