@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
+import { HexColorPicker } from "react-colorful";
+
 interface Props {
   sessionName: string;
   itemCount: number;
@@ -19,6 +22,24 @@ export default function Topbar({
   onClear,
   onColorChange,
 }: Props) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // close picker when selection is cleared
+  useEffect(() => {
+    if (!hasSelection) setPickerOpen(false);
+  }, [hasSelection]);
+
   return (
     <div
       style={{
@@ -46,34 +67,28 @@ export default function Topbar({
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {hasSelection && (
           <>
-            <div
-              title="Change color"
-              style={{
-                position: "relative",
-                width: 20,
-                height: 20,
-                borderRadius: "50%",
-                backgroundColor: selectedColor ?? "#888",
-                border: "2px solid #404040",
-                cursor: "pointer",
-                flexShrink: 0,
-              }}
-            >
-              <input
-                type="color"
-                value={selectedColor ?? "#888888"}
-                onChange={(e) => onColorChange(e.target.value)}
+            <div ref={pickerRef} style={{ position: "relative" }}>
+              <div
+                title="Change color"
+                onClick={() => setPickerOpen((o) => !o)}
                 style={{
-                  position: "absolute",
-                  inset: 0,
-                  opacity: 0,
-                  width: "100%",
-                  height: "100%",
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  backgroundColor: selectedColor ?? "#888",
+                  border: "2px solid #404040",
                   cursor: "pointer",
-                  border: "none",
-                  padding: 0,
+                  flexShrink: 0,
                 }}
               />
+              {pickerOpen && (
+                <div style={{ position: "absolute", top: 28, right: 0, zIndex: 100 }}>
+                  <HexColorPicker
+                    color={selectedColor ?? "#888888"}
+                    onChange={onColorChange}
+                  />
+                </div>
+              )}
             </div>
             <button
               onClick={onDelete}
