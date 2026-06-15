@@ -7,7 +7,6 @@ import { CanvasItem } from "./KonvaAsset";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
-// Konva must be client-only
 const CanvasStage = dynamic(() => import("./CanvasStage"), { ssr: false });
 
 export default function CanvasPage() {
@@ -19,7 +18,8 @@ export default function CanvasPage() {
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
   const idCounter = useRef(0);
 
-  // Keyboard shortcuts
+  const selectedItem = items.find((i) => i.instanceId === selectedId);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
@@ -36,7 +36,6 @@ export default function CanvasPage() {
 
   const handleGenerate = (prompt: string, assets: Asset[]) => {
     setIsLoading(true);
-    // Simulate network latency for when API is wired in
     setTimeout(() => {
       setPalette(assets);
       setSubmittedPrompt(prompt);
@@ -79,20 +78,17 @@ export default function CanvasPage() {
     setSelectedId(null);
   };
 
+  const handleColorChange = (color: string) => {
+    if (!selectedId) return;
+    handleChange(selectedId, { color });
+  };
+
   const handleSizeChange = useCallback((w: number, h: number) => {
     setStageSize({ width: w, height: h });
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        backgroundColor: "#030712",
-        color: "#f5f5f5",
-        overflow: "hidden",
-      }}
-    >
+    <div style={{ display: "flex", height: "100vh", backgroundColor: "#030712", color: "#f5f5f5", overflow: "hidden" }}>
       <Sidebar
         palette={palette}
         submittedPrompt={submittedPrompt}
@@ -100,25 +96,15 @@ export default function CanvasPage() {
         onGenerate={handleGenerate}
         onAddAsset={handleAddAsset}
       />
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          minWidth: 0,
-        }}
-      >
+      <main style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <Topbar
-          sessionName={
-            submittedPrompt ? `"${submittedPrompt}"` : "Untitled session"
-          }
+          sessionName={submittedPrompt ? `"${submittedPrompt}"` : "Untitled session"}
           itemCount={items.length}
           hasSelection={!!selectedId}
+          selectedColor={selectedItem?.color ?? (selectedItem ? getDefaultColor(selectedItem) : undefined)}
           onDelete={handleDelete}
-          onClear={() => {
-            setItems([]);
-            setSelectedId(null);
-          }}
+          onColorChange={handleColorChange}
+          onClear={() => { setItems([]); setSelectedId(null); }}
         />
         <CanvasStage
           items={items}
@@ -130,4 +116,15 @@ export default function CanvasPage() {
       </main>
     </div>
   );
+}
+
+function getDefaultColor(item: CanvasItem): string {
+  const r = item.render;
+  if (r.type === "line" || r.type === "cross") return r.stroke;
+  if (r.type === "circle" || r.type === "path") {
+    const hasFill = r.fill && r.fill !== "transparent";
+    return hasFill ? r.fill! : (r.stroke ?? "#888888");
+  }
+  if (r.type === "rect" || r.type === "dots") return r.fill;
+  return "#888888";
 }
