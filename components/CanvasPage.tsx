@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Asset, ASSET_DB } from "@/lib/assets";
+import { Asset, ASSET_DB, fetchRemoteAssets } from "@/lib/assets";
 import { CanvasItem } from "./KonvaAsset";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -11,6 +11,7 @@ const CanvasStage = dynamic(() => import("./CanvasStage"), { ssr: false });
 
 export default function CanvasPage() {
   const [palette, setPalette] = useState<Asset[]>(ASSET_DB.slice(0, 12));
+  const [remoteAssets, setRemoteAssets] = useState<Asset[]>([]);
   const [submittedPrompt, setSubmittedPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState<CanvasItem[]>([]);
@@ -19,6 +20,10 @@ export default function CanvasPage() {
   const idCounter = useRef(0);
 
   const selectedItem = items.find((i) => i.instanceId === selectedId);
+
+  useEffect(() => {
+    fetchRemoteAssets().then(setRemoteAssets);
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -91,6 +96,7 @@ export default function CanvasPage() {
     <div style={{ display: "flex", height: "100vh", backgroundColor: "#030712", color: "#f5f5f5", overflow: "hidden" }}>
       <Sidebar
         palette={palette}
+        remoteAssets={remoteAssets}
         submittedPrompt={submittedPrompt}
         isLoading={isLoading}
         onGenerate={handleGenerate}

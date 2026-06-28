@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Circle, Group, Line, Path, Rect, Transformer } from "react-konva";
+import { useEffect, useRef, useState } from "react";
+import { Circle, Group, Image, Line, Path, Rect, Transformer } from "react-konva";
 import Konva from "konva";
 import { Asset } from "@/lib/assets";
 
@@ -27,6 +27,14 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange }: Pro
   const trRef = useRef<Konva.Transformer>(null);
   const r = item.render;
   const c = item.color;
+  const [svgImage, setSvgImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    if (r.type !== "svg") return;
+    const img = new window.Image();
+    img.src = r.svg_url;
+    img.onload = () => setSvgImage(img);
+  }, [r.type === "svg" ? r.svg_url : null]);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
@@ -118,6 +126,17 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange }: Pro
             <Circle key={i} x={x} y={y} radius={r.radius} fill={c ?? r.fill} />
           ))}
         </Group>
+      );
+    }
+    if (r.type === "svg") {
+      return (
+        <Image
+          ref={shapeRef as React.RefObject<Konva.Image>}
+          {...commonProps}
+          image={svgImage ?? undefined}
+          width={r.width}
+          height={r.height}
+        />
       );
     }
     if (r.type === "cross") {

@@ -6,6 +6,7 @@ import AssetThumb from "./AssetThumb";
 
 interface Props {
   palette: Asset[];
+  remoteAssets: Asset[];
   submittedPrompt: string;
   isLoading: boolean;
   onGenerate: (prompt: string, assets: Asset[]) => void;
@@ -14,6 +15,7 @@ interface Props {
 
 export default function Sidebar({
   palette,
+  remoteAssets,
   submittedPrompt,
   isLoading,
   onGenerate,
@@ -135,7 +137,7 @@ export default function Sidebar({
               marginBottom: "12px",
             }}
           >
-            Default palette
+            Default Shapes
           </p>
         )}
         <div
@@ -190,6 +192,75 @@ export default function Sidebar({
           ))}
         </div>
       </div>
+
+      {/* Library — remote SVG assets */}
+      {remoteAssets.length > 0 && (
+        <div style={{ padding: "0 16px 16px" }}>
+          <p
+            style={{
+              fontSize: "10px",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: "#737373",
+              marginBottom: "12px",
+              paddingTop: "12px",
+              borderTop: "1px solid #404040",
+            }}
+          >
+            Library
+          </p>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "8px",
+            }}
+          >
+            {remoteAssets.map((asset) => (
+              <button
+                key={asset.id}
+                onClick={() => onAddAsset(asset)}
+                title={`Add ${asset.label}`}
+                style={{
+                  aspectRatio: "1",
+                  backgroundColor: "#1a1a1a",
+                  border: "1px solid #404040",
+                  borderRadius: "6px",
+                  padding: "8px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#262626";
+                  e.currentTarget.style.borderColor = "#505050";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#1a1a1a";
+                  e.currentTarget.style.borderColor = "#404040";
+                }}
+              >
+                <div style={{ width: 32, height: 32 }}>
+                  <AssetThumb asset={asset} />
+                </div>
+                <span
+                  style={{
+                    fontSize: "9px",
+                    color: "#737373",
+                    lineHeight: 1.2,
+                    textAlign: "center",
+                  }}
+                >
+                  {asset.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div style={{ padding: "12px 16px", borderTop: "1px solid #404040" }}>

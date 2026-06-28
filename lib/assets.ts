@@ -1,10 +1,13 @@
+import { supabase } from "./supabase";
+
 export type AssetRender =
   | { type: "path"; d: string; fill?: string; stroke?: string; strokeWidth?: number; width: number; height: number }
   | { type: "circle"; radius: number; fill?: string; stroke?: string; strokeWidth?: number; width: number; height: number }
   | { type: "line"; points: number[]; stroke: string; strokeWidth: number; width: number; height: number }
   | { type: "rect"; width: number; height: number; fill: string; rx?: number }
   | { type: "dots"; positions: [number, number][]; radius: number; fill: string; width: number; height: number }
-  | { type: "cross"; stroke: string; strokeWidth: number; width: number; height: number };
+  | { type: "cross"; stroke: string; strokeWidth: number; width: number; height: number }
+  | { type: "svg"; svg_url: string; width: number; height: number };
 
 export interface Asset {
   id: string;
@@ -12,6 +15,14 @@ export interface Asset {
   tags: string[];
   moods: string[];
   render: AssetRender;
+}
+
+export interface RemoteAsset {
+  id: string;
+  label: string;
+  tags: string[];
+  moods: string[];
+  svg_url: string;
 }
 
 export const ASSET_DB: Asset[] = [
@@ -131,4 +142,24 @@ export function filterAssets(prompt: string): Asset[] {
   const sorted = scored.sort((a, b) => b.score - a.score);
   const top = sorted.filter((a) => a.score > 0).slice(0, 12);
   return top.length >= 6 ? top : ASSET_DB.slice(0, 12);
+}
+
+export async function fetchRemoteAssets(): Promise<Asset[]> {
+  const { data, error } = await supabase
+    .from("assets")
+    .select("id, label, tags, moods, svg_url")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch remote assets:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((r: RemoteAsset) => ({
+    id: r.id,
+    label: r.label,
+    tags: r.tags,
+    moods: r.moods,
+    render: { type: "svg" as const, svg_url: r.svg_url, width: 80, height: 80 },
+  }));
 }

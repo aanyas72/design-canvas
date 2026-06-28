@@ -7,6 +7,16 @@ export default function AssetThumb({ asset }: { asset: Asset }) {
   const ox = 5,
     oy = 5;
 
+  if (r.type === "svg") {
+    return (
+      <img
+        src={r.svg_url}
+        alt={asset.label}
+        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+      />
+    );
+  }
+
   return (
     <svg
       viewBox={`0 0 ${vw} ${vh}`}
