@@ -29,6 +29,7 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange, readO
   const r = item.render;
   const c = item.color;
   const [svgImage, setSvgImage] = useState<HTMLImageElement | null>(null);
+  const [naturalSize, setNaturalSize] = useState<{ w: number; h: number } | null>(null);
   const svgTextRef = useRef<string | null>(null);
 
   // Fetch SVG text once per URL
@@ -37,7 +38,7 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange, readO
     svgTextRef.current = null;
     fetch(r.svg_url).then((res) => res.text()).then((text) => {
       svgTextRef.current = text;
-      applyColor(text, c ?? "#ffffff");
+      applyColor(text, c ?? "#ffffff", true);
     });
   }, [r.type === "svg" ? r.svg_url : null]);
 
@@ -47,14 +48,22 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange, readO
     applyColor(svgTextRef.current, c ?? "#ffffff");
   }, [c]);
 
-  function applyColor(text: string, color: string) {
+  function applyColor(text: string, color: string, firstLoad = false) {
     const colored = text
       .replace(/fill="(?!none\b)[^"]+"/gi, `fill="${color}"`)
       .replace(/fill:\s*(?!none\b)[^;}"]+/gi, `fill:${color}`);
     const blob = new Blob([colored], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const img = new window.Image();
-    img.onload = () => { setSvgImage(img); URL.revokeObjectURL(url); };
+    img.onload = () => {
+      setSvgImage(img);
+      if (firstLoad) {
+        const MAX = 300;
+        const scale = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+        setNaturalSize({ w: img.naturalWidth * scale, h: img.naturalHeight * scale });
+      }
+      URL.revokeObjectURL(url);
+    };
     img.src = url;
   }
 
@@ -163,8 +172,8 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange, readO
           ref={shapeRef as React.RefObject<Konva.Image>}
           {...commonProps}
           image={svgImage ?? undefined}
-          width={r.width}
-          height={r.height}
+          width={naturalSize?.w ?? r.width}
+          height={naturalSize?.h ?? r.height}
         />
       );
     }
