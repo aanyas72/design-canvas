@@ -12,6 +12,9 @@ interface Props {
   onDelete: () => void;
   onClear: () => void;
   onColorChange: (color: string) => void;
+  timeLeft?: number | null;
+  phase?: "setup" | "playing" | "done";
+  onRestart?: () => void;
 }
 
 export default function Topbar({
@@ -22,6 +25,9 @@ export default function Topbar({
   onDelete,
   onClear,
   onColorChange,
+  timeLeft,
+  phase,
+  onRestart,
 }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -134,32 +140,41 @@ export default function Topbar({
             Clear all
           </button>
         )}
-        <button
-          style={{
-            fontSize: "11px",
-            color: "#d4d4d4",
-            padding: "6px 12px",
-            borderRadius: "4px",
-            border: "none",
-            backgroundColor: "transparent",
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            cursor: "pointer",
-            marginRight: "8px",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = "white";
-            e.currentTarget.style.backgroundColor = "#262626";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "#d4d4d4";
-            e.currentTarget.style.backgroundColor = "transparent";
-          }}
-        >
-          <span>+</span>
-          <span>Invite</span>
-        </button>
+        {phase === "done" && (
+          <button
+            onClick={onRestart}
+            style={{
+              fontSize: "11px",
+              color: "#737373",
+              padding: "4px 10px",
+              borderRadius: "4px",
+              border: "1px solid #404040",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#a3a3a3"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#737373"; }}
+          >
+            New session
+          </button>
+        )}
+        {phase === "done" && (
+          <span style={{ fontSize: "12px", color: "#22c55e" }}>Time&rsquo;s up</span>
+        )}
+        {timeLeft !== null && timeLeft !== undefined && phase === "playing" && (
+          <span
+            style={{
+              fontSize: "18px",
+              fontWeight: 700,
+              color: timeLeft <= 10 ? "#f87171" : timeLeft <= 30 ? "#fb923c" : "#a3a3a3",
+              fontVariantNumeric: "tabular-nums",
+              minWidth: 48,
+              textAlign: "right",
+            }}
+          >
+            {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+          </span>
+        )}
       </div>
     </div>
   );

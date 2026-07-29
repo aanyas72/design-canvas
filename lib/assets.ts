@@ -124,12 +124,16 @@ export const ASSET_DB: Asset[] = [
   },
 ];
 
-export function filterAssets(prompt: string): Asset[] {
-  if (!prompt.trim()) return ASSET_DB.slice(0, 12);
+const PALETTE_LIMIT = 12;
+
+export function filterAssets(prompt: string, remotePool: Asset[] = []): Asset[] {
+  const pool = [...ASSET_DB, ...remotePool];
+
+  if (!prompt.trim()) return ASSET_DB.slice(0, PALETTE_LIMIT);
 
   const words = prompt.toLowerCase().split(/\s+/);
 
-  const scored = ASSET_DB.map((asset) => {
+  const scored = pool.map((asset) => {
     let score = 0;
     words.forEach((w) => {
       asset.tags.forEach((t) => { if (t.includes(w) || w.includes(t)) score += 2; });
@@ -140,8 +144,8 @@ export function filterAssets(prompt: string): Asset[] {
   });
 
   const sorted = scored.sort((a, b) => b.score - a.score);
-  const top = sorted.filter((a) => a.score > 0).slice(0, 12);
-  return top.length >= 6 ? top : ASSET_DB.slice(0, 12);
+  const top = sorted.filter((a) => a.score > 0).slice(0, PALETTE_LIMIT);
+  return top.length >= 6 ? top : ASSET_DB.slice(0, PALETTE_LIMIT);
 }
 
 export async function fetchRemoteAssets(): Promise<Asset[]> {
