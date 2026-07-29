@@ -168,6 +168,7 @@ export default function GamePage() {
   const selectedColor = selectedItem?.color ?? (() => {
     if (!selectedItem) return undefined;
     const r = selectedItem.render;
+    if (r.type === "svg") return "#ffffff";
     if (r.type === "line" || r.type === "cross") return r.stroke;
     if (r.type === "circle" || r.type === "path") return (r.fill && r.fill !== "transparent") ? r.fill : (r.stroke ?? "#888888");
     if (r.type === "rect" || r.type === "dots") return r.fill;

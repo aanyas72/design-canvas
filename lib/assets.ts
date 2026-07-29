@@ -124,16 +124,11 @@ export const ASSET_DB: Asset[] = [
   },
 ];
 
-const PALETTE_LIMIT = 12;
+const MATCHED_LIMIT = 12;
 
-export function filterAssets(prompt: string, remotePool: Asset[] = []): Asset[] {
-  const pool = [...ASSET_DB, ...remotePool];
-
-  if (!prompt.trim()) return ASSET_DB.slice(0, PALETTE_LIMIT);
-
+function scoreAssets(assets: Asset[], prompt: string): (Asset & { score: number })[] {
   const words = prompt.toLowerCase().split(/\s+/);
-
-  const scored = pool.map((asset) => {
+  return assets.map((asset) => {
     let score = 0;
     words.forEach((w) => {
       asset.tags.forEach((t) => { if (t.includes(w) || w.includes(t)) score += 2; });
@@ -142,10 +137,14 @@ export function filterAssets(prompt: string, remotePool: Asset[] = []): Asset[] 
     });
     return { ...asset, score };
   });
+}
 
-  const sorted = scored.sort((a, b) => b.score - a.score);
-  const top = sorted.filter((a) => a.score > 0).slice(0, PALETTE_LIMIT);
-  return top.length >= 6 ? top : ASSET_DB.slice(0, PALETTE_LIMIT);
+export function filterAssets(prompt: string, remotePool: Asset[] = []): Asset[] {
+  if (!prompt.trim()) return remotePool;
+  return scoreAssets(remotePool, prompt)
+    .filter((a) => a.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, MATCHED_LIMIT);
 }
 
 export async function fetchRemoteAssets(): Promise<Asset[]> {
@@ -164,6 +163,6 @@ export async function fetchRemoteAssets(): Promise<Asset[]> {
     label: r.label,
     tags: r.tags,
     moods: r.moods,
-    render: { type: "svg" as const, svg_url: r.svg_url, width: 80, height: 80 },
+    render: { type: "svg" as const, svg_url: r.svg_url, width: 200, height: 200 },
   }));
 }

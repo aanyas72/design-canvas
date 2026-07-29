@@ -29,13 +29,41 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange, readO
   const r = item.render;
   const c = item.color;
   const [svgImage, setSvgImage] = useState<HTMLImageElement | null>(null);
+  const svgTextRef = useRef<string | null>(null);
 
+  // Fetch SVG text once per URL
   useEffect(() => {
     if (r.type !== "svg") return;
-    const img = new window.Image();
-    img.src = r.svg_url;
-    img.onload = () => setSvgImage(img);
+    svgTextRef.current = null;
+    fetch(r.svg_url).then((res) => res.text()).then((text) => {
+      svgTextRef.current = text;
+      applyColor(text, c ?? "#ffffff");
+    });
   }, [r.type === "svg" ? r.svg_url : null]);
+
+  // Recolor without re-fetching when color changes
+  useEffect(() => {
+    if (r.type !== "svg" || !svgTextRef.current) return;
+    applyColor(svgTextRef.current, c ?? "#ffffff");
+  }, [c]);
+
+  function applyColor(text: string, color: string) {
+    const colored = text
+      .replace(/fill="(?!none\b)[^"]+"/gi, `fill="${color}"`)
+      .replace(/fill:\s*(?!none\b)[^;}"]+/gi, `fill:${color}`);
+    const blob = new Blob([colored], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const img = new window.Image();
+    img.onload = () => { setSvgImage(img); URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  // Force Konva to redraw after image loads
+  useEffect(() => {
+    if (svgImage && shapeRef.current) {
+      shapeRef.current.getLayer()?.batchDraw();
+    }
+  }, [svgImage]);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {

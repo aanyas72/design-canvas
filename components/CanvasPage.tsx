@@ -336,6 +336,7 @@ export default function CanvasPage() {
 
 function getDefaultColor(item: CanvasItem): string {
   const r = item.render;
+  if (r.type === "svg") return "#ffffff";
   if (r.type === "line" || r.type === "cross") return r.stroke;
   if (r.type === "circle" || r.type === "path") {
     const hasFill = r.fill && r.fill !== "transparent";
