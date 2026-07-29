@@ -18,6 +18,49 @@ interface AssetDraft {
 export default function UploadPage() {
   const [drafts, setDrafts] = useState<AssetDraft[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [genPrompt, setGenPrompt] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | undefined>(undefined);
+
+  const addSvgContent = useCallback((svgContent: string, label: string) => {
+    const blob = new Blob([svgContent], { type: "image/svg+xml" });
+    const file = new File([blob], `${label.replace(/\s+/g, "-").toLowerCase() || "generated"}.svg`, {
+      type: "image/svg+xml",
+    });
+    setDrafts((prev) => [
+      ...prev,
+      {
+        file,
+        objectUrl: URL.createObjectURL(blob),
+        svgContent,
+        label,
+        tags: "",
+        moods: "",
+        status: "idle",
+      },
+    ]);
+  }, []);
+
+  const generateSvg = useCallback(async () => {
+    if (!genPrompt.trim()) return;
+    setGenerating(true);
+    setGenError(undefined);
+    try {
+      const res = await fetch("/api/generate-svg", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: genPrompt }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      addSvgContent(data.svg, genPrompt.trim());
+      setGenPrompt("");
+    } catch (err) {
+      setGenError(String(err));
+    } finally {
+      setGenerating(false);
+    }
+  }, [genPrompt, addSvgContent]);
 
   const addFiles = useCallback((files: FileList | null) => {
     if (!files) return;
@@ -153,6 +196,45 @@ export default function UploadPage() {
             onChange={(e) => addFiles(e.target.files)}
           />
         </div>
+
+        {/* AI generate */}
+        <div
+          style={{
+            border: "1px solid #404040",
+            borderRadius: "10px",
+            padding: "16px",
+            marginBottom: "32px",
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+          }}
+        >
+          <input
+            value={genPrompt}
+            onChange={(e) => setGenPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !generating) generateSvg();
+            }}
+            placeholder="Describe an SVG to generate, e.g. 'jagged lightning bolt'"
+            disabled={generating}
+            style={{
+              flex: 1,
+              backgroundColor: "#1a1a1a",
+              border: "1px solid #404040",
+              borderRadius: "5px",
+              color: "#f5f5f5",
+              fontSize: "12px",
+              padding: "8px 10px",
+              outline: "none",
+            }}
+          />
+          <Btn onClick={generateSvg} disabled={generating || !genPrompt.trim()}>
+            {generating ? "Generating…" : "Generate with AI"}
+          </Btn>
+        </div>
+        {genError && (
+          <p style={{ fontSize: "11px", color: "#f87171", marginTop: "-24px", marginBottom: "24px" }}>{genError}</p>
+        )}
 
         {/* Drafts */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>

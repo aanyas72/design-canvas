@@ -50,7 +50,7 @@ Return ONLY valid JSON array, no explanation.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-3.1-flash-lite",
       contents: systemPrompt,
     });
 
