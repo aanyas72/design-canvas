@@ -39,8 +39,8 @@ export default function CanvasPage() {
   const [timerSeconds, setTimerSeconds] = useState<number | null>(60);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
-  const [palette, setPalette] = useState<Asset[]>(ASSET_DB.slice(0, 12));
   const [remoteAssets, setRemoteAssets] = useState<Asset[]>([]);
+  const [matchedAssets, setMatchedAssets] = useState<Asset[]>([]);
   const [submittedPrompt, setSubmittedPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState<CanvasItem[]>([]);
@@ -82,7 +82,7 @@ export default function CanvasPage() {
     if (!setupPrompt.trim()) return;
     setIsLoading(true);
     setTimeout(() => {
-      setPalette(filterAssets(setupPrompt, remoteAssets));
+      setMatchedAssets(filterAssets(setupPrompt, remoteAssets).filter((a) => a.render.type === "svg"));
       setSubmittedPrompt(setupPrompt);
       setItems([]);
       setSelectedId(null);
@@ -95,7 +95,7 @@ export default function CanvasPage() {
   const handleGenerate = (prompt: string) => {
     setIsLoading(true);
     setTimeout(() => {
-      setPalette(filterAssets(prompt, remoteAssets));
+      setMatchedAssets(filterAssets(prompt, remoteAssets).filter((a) => a.render.type === "svg"));
       setSubmittedPrompt(prompt);
       setItems([]);
       setSelectedId(null);
@@ -303,10 +303,9 @@ export default function CanvasPage() {
   return (
     <div style={{ display: "flex", height: "100vh", backgroundColor: "#030712", color: "#f5f5f5", overflow: "hidden" }}>
       <Sidebar
-        palette={palette}
+        palette={ASSET_DB}
+        matchedAssets={matchedAssets}
         submittedPrompt={submittedPrompt}
-        isLoading={isLoading}
-        onGenerate={handleGenerate}
         onAddAsset={phase === "playing" ? handleAddAsset : () => {}}
       />
       <main style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
