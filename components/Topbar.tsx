@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { HexColorPicker } from "react-colorful";
 
 interface Props {
@@ -55,6 +56,13 @@ export default function Topbar({
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <Link href="/" style={{ fontSize: "12px", color: "#525252", textDecoration: "none" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#a3a3a3"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#525252"; }}
+        >
+          ← Home
+        </Link>
+        <span style={{ color: "#404040" }}>|</span>
         <span style={{ fontSize: "14px", fontWeight: 500, color: "#e5e5e5" }}>
           {sessionName}
         </span>

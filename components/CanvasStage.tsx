@@ -11,6 +11,7 @@ interface Props {
   onSelect: (id: string | null) => void;
   onChange: (instanceId: string, updates: Partial<CanvasItem>) => void;
   onSizeChange: (w: number, h: number) => void;
+  readOnly?: boolean;
 }
 
 export default function CanvasStage({
@@ -19,6 +20,7 @@ export default function CanvasStage({
   onSelect,
   onChange,
   onSizeChange,
+  readOnly = false,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -86,9 +88,10 @@ export default function CanvasStage({
             <KonvaAsset
               key={item.instanceId}
               item={item}
-              isSelected={selectedId === item.instanceId}
+              isSelected={!readOnly && selectedId === item.instanceId}
               onSelect={() => onSelect(item.instanceId)}
               onChange={(updates) => onChange(item.instanceId, updates)}
+              readOnly={readOnly}
             />
           ))}
         </Layer>

@@ -20,9 +20,10 @@ interface Props {
   isSelected: boolean;
   onSelect: () => void;
   onChange: (updates: Partial<CanvasItem>) => void;
+  readOnly?: boolean;
 }
 
-export default function KonvaAsset({ item, isSelected, onSelect, onChange }: Props) {
+export default function KonvaAsset({ item, isSelected, onSelect, onChange, readOnly = false }: Props) {
   const shapeRef = useRef<Konva.Node>(null);
   const trRef = useRef<Konva.Transformer>(null);
   const r = item.render;
@@ -46,9 +47,9 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange }: Pro
   const commonProps = {
     x: item.x,
     y: item.y,
-    draggable: true,
-    onClick: onSelect,
-    onTap: onSelect,
+    draggable: !readOnly,
+    onClick: readOnly ? undefined : onSelect,
+    onTap: readOnly ? undefined : onSelect,
     scaleX: item.scaleX,
     scaleY: item.scaleY,
     rotation: item.rotation,

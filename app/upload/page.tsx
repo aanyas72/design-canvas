@@ -116,7 +116,7 @@ export default function UploadPage() {
       {/* Header */}
       <div style={{ borderBottom: "1px solid #404040", padding: "14px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
         <Link href="/" style={{ color: "#737373", fontSize: "13px", textDecoration: "none" }}>
-          ← Canvas
+          ← Home
         </Link>
         <span style={{ color: "#404040" }}>|</span>
         <span style={{ fontSize: "13px", color: "#a3a3a3" }}>Asset Library</span>
