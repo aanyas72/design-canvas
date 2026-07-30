@@ -51,7 +51,10 @@ export default function KonvaAsset({ item, isSelected, onSelect, onChange, readO
   function applyColor(text: string, color: string, firstLoad = false) {
     const colored = text
       .replace(/fill="(?!none\b)[^"]+"/gi, `fill="${color}"`)
-      .replace(/fill:\s*(?!none\b)[^;}"]+/gi, `fill:${color}`);
+      .replace(/fill:\s*(?!none\b)[^;}"]+/gi, `fill:${color}`)
+      .replace(/stroke="(?!none\b)[^"]+"/gi, `stroke="${color}"`)
+      .replace(/stroke:\s*(?!none\b)[^;}"]+/gi, `stroke:${color}`)
+      .replace(/<svg\b(?![^>]*\bfill=)/i, `<svg fill="${color}"`);
     const blob = new Blob([colored], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const img = new window.Image();

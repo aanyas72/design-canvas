@@ -18,7 +18,10 @@ export async function POST(request: Request) {
 Rules:
 - viewBox="0 0 80 80" (or similar small square/rect dimensions matching this design system's assets)
 - Use plain shapes: path, circle, rect, line, or polyline
-- Flat fills or single stroke color, no gradients, no filters, no text, no raster images
+- No gradients, no filters, no text, no raster images
+- Use a single flat color, "#000", for every shape's fill or stroke — the app recolors this automatically at render time, so the exact color doesn't matter, but it must be explicit
+- Every shape must be EITHER filled (fill="#000", stroke="none" or omitted) OR stroked (fill="none" stroke="#000" stroke-width="..."), never left with no fill/stroke at all — an unstyled shape defaults to black and won't recolor correctly
+- Do not mix filled and stroked shapes with different intents in confusing ways; keep each shape's paint style unambiguous
 - Keep it minimal and abstract, not a literal illustration
 - Return ONLY the raw <svg>...</svg> markup, no markdown fences, no explanation
 
