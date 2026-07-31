@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { HexColorPicker } from "react-colorful";
-import { Asset, filterAssets } from "@/lib/assets";
+import { Asset, ASSET_DB, fetchRemoteAssets, filterAssets } from "@/lib/assets";
 import { CanvasItem } from "@/components/KonvaAsset";
 import AssetThumb from "@/components/AssetThumb";
 import { AiPlacement } from "@/app/api/ai-place/route";
@@ -13,19 +13,27 @@ const CanvasStage = dynamic(() => import("@/components/CanvasStage"), { ssr: fal
 
 type Phase = "prompt" | "placing" | "done";
 
-const GAME_DURATION = 60;
+const DURATION_OPTIONS = [
+  { label: "30s", seconds: 30 },
+  { label: "60s", seconds: 60 },
+  { label: "2 min", seconds: 120 },
+  { label: "3 min", seconds: 180 },
+];
+const DEFAULT_DURATION = 60;
 const AI_STAGGER_MS = 500;
 
 export default function GamePage() {
   const [phase, setPhase] = useState<Phase>("prompt");
   const [prompt, setPrompt] = useState("");
   const [palette, setPalette] = useState<Asset[]>([]);
+  const [remoteAssets, setRemoteAssets] = useState<Asset[]>([]);
+  const [gameDuration, setGameDuration] = useState(DEFAULT_DURATION);
 
   const [userItems, setUserItems] = useState<CanvasItem[]>([]);
   const [userSelectedId, setUserSelectedId] = useState<string | null>(null);
   const [aiItems, setAiItems] = useState<CanvasItem[]>([]);
 
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
+  const [timeLeft, setTimeLeft] = useState(DEFAULT_DURATION);
   const [aiStatus, setAiStatus] = useState<"idle" | "thinking" | "placing" | "done">("idle");
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -36,6 +44,10 @@ export default function GamePage() {
 
   const handleUserSizeChange = useCallback((w: number, h: number) => {
     stageSize.current = { width: w, height: h };
+  }, []);
+
+  useEffect(() => {
+    fetchRemoteAssets().then(setRemoteAssets);
   }, []);
 
   const noop = useCallback(() => {}, []);
@@ -74,12 +86,13 @@ export default function GamePage() {
 
   const startGame = async () => {
     if (!prompt.trim()) return;
-    const assets = filterAssets(prompt);
+    const matched = filterAssets(prompt, remoteAssets).filter((a) => a.render.type === "svg");
+    const assets = [...ASSET_DB, ...matched];
     setPalette(assets);
     setUserItems([]);
     setAiItems([]);
     setUserSelectedId(null);
-    setTimeLeft(GAME_DURATION);
+    setTimeLeft(gameDuration);
     setAiStatus("thinking");
     setPhase("placing");
 
@@ -264,7 +277,27 @@ export default function GamePage() {
               Start
             </button>
           </div>
-          <p style={{ fontSize: "11px", color: "#404040", margin: 0 }}>60 seconds · same assets · you vs AI</p>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {DURATION_OPTIONS.map((opt) => (
+              <button
+                key={opt.label}
+                onClick={() => setGameDuration(opt.seconds)}
+                style={{
+                  padding: "6px 14px",
+                  borderRadius: "6px",
+                  border: `1px solid ${gameDuration === opt.seconds ? "#6366f1" : "#404040"}`,
+                  backgroundColor: gameDuration === opt.seconds ? "#1a1a2e" : "#0f0f0f",
+                  color: gameDuration === opt.seconds ? "#818cf8" : "#737373",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <p style={{ fontSize: "11px", color: "#404040", margin: 0 }}>same assets · you vs AI</p>
         </div>
       )}
 
