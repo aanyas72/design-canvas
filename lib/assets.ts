@@ -125,9 +125,43 @@ export const ASSET_DB: Asset[] = [
 ];
 
 const MATCHED_LIMIT = 12;
+const FALLBACK_LIMIT = 6;
+
+// Maps common everyday words to the mood/tag vocabulary used by assets, so
+// prompts that don't share literal text with an asset's tags can still match.
+const SYNONYMS: Record<string, string[]> = {
+  great: ["happy", "bright", "energetic", "energy"],
+  good: ["happy", "bright", "calm"],
+  amazing: ["happy", "bright", "energetic"],
+  wonderful: ["happy", "bright", "soft"],
+  bad: ["night", "weight", "pressure"],
+  sad: ["night", "weight", "pressure", "soft"],
+  day: ["morning", "bright", "light"],
+  sunny: ["sun", "sunshine", "bright", "light"],
+  warm: ["sun", "sunshine", "bright", "soft"],
+  cold: ["night", "distance", "fog"],
+  dark: ["night", "weight", "pressure"],
+  fun: ["energetic", "energy", "bright"],
+  relaxed: ["calm", "soft", "airy"],
+  chill: ["calm", "soft", "airy"],
+  stress: ["tension", "pressure", "focus"],
+  stressed: ["tension", "pressure", "focus"],
+  excited: ["energy", "energetic", "speed"],
+  scared: ["tension", "cut", "night"],
+  calm: ["calm", "soft", "airy"],
+  peaceful: ["calm", "soft", "airy", "fog"],
+  fast: ["speed", "energy", "directional"],
+  slow: ["calm", "static", "heavy"],
+};
+
+function expandWords(words: string[]): string[] {
+  const expanded = new Set(words);
+  words.forEach((w) => SYNONYMS[w]?.forEach((s) => expanded.add(s)));
+  return [...expanded];
+}
 
 function scoreAssets(assets: Asset[], prompt: string): (Asset & { score: number })[] {
-  const words = prompt.toLowerCase().split(/\s+/);
+  const words = expandWords(prompt.toLowerCase().split(/\s+/));
   return assets.map((asset) => {
     let score = 0;
     words.forEach((w) => {
@@ -141,10 +175,15 @@ function scoreAssets(assets: Asset[], prompt: string): (Asset & { score: number 
 
 export function filterAssets(prompt: string, remotePool: Asset[] = []): Asset[] {
   if (!prompt.trim()) return remotePool;
-  return scoreAssets(remotePool, prompt)
+  const matched = scoreAssets(remotePool, prompt)
     .filter((a) => a.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, MATCHED_LIMIT);
+
+  if (matched.length > 0) return matched;
+
+  // No literal or synonym match — surface a small random sample instead of nothing.
+  return [...remotePool].sort(() => Math.random() - 0.5).slice(0, FALLBACK_LIMIT);
 }
 
 export async function fetchRemoteAssets(): Promise<Asset[]> {
