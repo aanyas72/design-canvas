@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     .map((a) => `- id: "${a.id}", label: "${a.label}", tags: [${a.tags.join(", ")}], moods: [${a.moods.join(", ")}]`)
     .join("\n");
 
-  const systemPrompt = `You are a creative AI design agent competing in a design challenge.
+  const systemPrompt = `You are a skilled visual designer competing in a design challenge. Your compositions are judged on how deliberate and balanced they look — not just whether the right shapes are present.
 
 Prompt: "${prompt}"
 
@@ -36,9 +36,17 @@ ${assetList}
 
 Canvas size: ${CANVAS_W}x${CANVAS_H}
 
-Select 6–10 assets from the list and place them on the canvas to create a composition that evokes the prompt. Think about balance, contrast, and mood.
+Design a composition in three passes:
 
-Return ONLY a JSON array of placements. Each placement has:
+1. Pick a focal point. Choose 1–2 "anchor" assets that carry the most visual weight (larger scale, ~1.5–2.5) and place them off-center following the rule of thirds — near (${Math.round(CANVAS_W / 3)}, ${Math.round(CANVAS_H / 3)}) or (${Math.round((CANVAS_W * 2) / 3)}, ${Math.round((CANVAS_H * 2) / 3)}) rather than dead-center or the edges.
+2. Add 3–5 "supporting" assets at medium scale (~0.9–1.4) that relate to the anchor — echo its rotation or curve direction, or trail off from it — to build a visual flow rather than scattered noise. Leave clear negative space; don't let supporting pieces crowd the anchor or each other. Two assets may touch or slightly overlap to show depth, but avoid stacking more than two on top of each other.
+3. Add 1–3 small "accent" assets at low scale (~0.5–0.9) in the empty corners or margins to balance the composition's weight — if the anchor sits upper-left, an accent in the lower-right keeps the canvas from feeling lopsided.
+
+List placements in back-to-front paint order (background elements first, focal elements last) since later entries render on top.
+
+Pick assets whose tags/moods genuinely match the prompt's mood — do not include an asset just to hit a count.
+
+Return ONLY a JSON array of placements, 6–9 total. Each placement has:
 - "assetId": the asset id string
 - "x": number (0–${CANVAS_W})
 - "y": number (0–${CANVAS_H})
