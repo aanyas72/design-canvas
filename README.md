@@ -4,8 +4,9 @@ A prompt-driven design canvas built with Next.js and Konva. Type a mood or theme
 
 ## Modes
 
-- **Timed Canvas** (`/canvas`) — Free-form canvas. Enter a prompt to pull a matching asset palette, then drag, scale, rotate, and recolor pieces to compose a design.
+- **Timed Canvas** (`/canvas`) — Free-form canvas. Enter a prompt to pull a matching asset palette, then drag, scale, rotate, and recolor pieces to compose a design. Solo mode.
 - **AI Game Mode** (`/game`) — You and an AI agent get the same prompt and the same asset palette. A timer runs while you place assets on your canvas; the AI plans and places on its own canvas in parallel. Compare results when time's up.
+- **Collaborative Canvas**(`canvas/collab/{code}`) You can invite a friend to a collaborative canvas and work on designs together by sharing a link.
 - **Asset Library** (`/upload`) — Upload SVGs (drag-and-drop or file picker), generate new ones from a text prompt via Gemini, auto-label them (name/tags/moods) via Gemini, and save them to Supabase for use in both modes.
 
 ## How asset matching works
