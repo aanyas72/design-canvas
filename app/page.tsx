@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { generateRoomId } from "@/lib/room";
 
 export default function HomePage() {
+  const router = useRouter();
   return (
     <div
       style={{
@@ -56,6 +61,16 @@ export default function HomePage() {
             Compete against an AI agent. Same prompt, same assets.
           </span>
         </Link>
+        <button
+          className="mode-card"
+          onClick={() => router.push(`/canvas/collab/${generateRoomId()}`)}
+          style={{ cursor: "pointer", font: "inherit", textAlign: "left" }}
+        >
+          <span style={{ fontSize: "16px", fontWeight: 600, color: "#f5f5f5" }}>Collaborative Canvas</span>
+          <span style={{ fontSize: "12px", color: "#737373", lineHeight: 1.6 }}>
+            Start a live room and share the link. Build a canvas together in real time.
+          </span>
+        </button>
       </div>
 
       <Link

@@ -15,6 +15,7 @@ interface Props {
   timeLeft?: number | null;
   phase?: "setup" | "playing" | "done";
   onRestart?: () => void;
+  peers?: { clientId: string; name: string; color: string }[];
 }
 
 export default function Topbar({
@@ -28,6 +29,7 @@ export default function Topbar({
   timeLeft,
   phase,
   onRestart,
+  peers,
 }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -79,6 +81,32 @@ export default function Topbar({
         )}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {peers && peers.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+            {peers.map((p, i) => (
+              <div
+                key={p.clientId}
+                title={p.name}
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  backgroundColor: p.color,
+                  border: "2px solid #030712",
+                  marginLeft: i === 0 ? 0 : -8,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  color: "#030712",
+                }}
+              >
+                {p.name.charAt(0)}
+              </div>
+            ))}
+          </div>
+        )}
         {hasSelection && (
           <>
             <div ref={pickerRef} style={{ position: "relative" }}>
